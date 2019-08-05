@@ -1,3 +1,4 @@
+#! /usr/bin/env python
 
 import xfftspy
 
@@ -8,8 +9,8 @@ import std_msgs.msg
 def spectra_fowarding_loop(xffts):
     pub_dict = {}
     xffts.clear_buffer()
-    while not rospy.is_shotdown():
-        d = xffts.recieve_once()
+    while not rospy.is_shutdown():
+        d = xffts.receive_once()
 
         for bnum in d['data']:
             if bnum not in pub_dict:
@@ -18,14 +19,14 @@ def spectra_fowarding_loop(xffts):
                                         std_msgs.msg.Float32MultiArray,
                                         queue_size = 1)
                 pass
-
-            d_ = std_msgs.msg.Float32MultiArray(d['data'][bnum])
-            pub_dict[bnum].publish(d_)
+            spec = std_msgs.msg.Float32MultiArray()
+            spec.data = d['data'][bnum]
+            pub_dict[bnum].publish(spec)
             continue
         continue
     return
 
-if __name__='__main__':
+if __name__ == '__main__':
     rospy.init_node('xffts')
     host = 'localhost'
 
